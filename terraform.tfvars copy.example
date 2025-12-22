@@ -1,0 +1,16 @@
+# Copy this file to terraform.tfvars and update with your values
+
+aws_region         = "ap-northeast-1"
+notification_email = "canale0107@icloud.com"
+project_name       = "daily-cost-monitor"
+days_to_check      = 7
+
+# Environment and system tags
+environment = "prod"
+system_name = "dailycost"
+
+# Schedule expression (default: 9 AM JST daily)
+# Use cron format: cron(Minutes Hours Day-of-month Month Day-of-week Year)
+# Note: Times are in UTC
+schedule_expression = "cron(0 0 * * ? *)"  # UTC 00:00 = JST 09:00
+
