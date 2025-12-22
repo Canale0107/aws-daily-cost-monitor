@@ -42,7 +42,9 @@
         "lambda:PublishVersion",
         "lambda:CreateAlias",
         "lambda:UpdateAlias",
-        "lambda:DeleteAlias"
+        "lambda:DeleteAlias",
+        "lambda:ListVersionsByFunction",
+        "lambda:GetFunctionCodeSigningConfig"
       ],
       "Resource": "*"
     },
@@ -64,7 +66,8 @@
         "iam:ListRolePolicies",
         "iam:AttachRolePolicy",
         "iam:DetachRolePolicy",
-        "iam:ListAttachedRolePolicies"
+        "iam:ListAttachedRolePolicies",
+        "iam:ListInstanceProfilesForRole"
       ],
       "Resource": "*"
     },
@@ -90,7 +93,9 @@
         "logs:TagLogGroup",
         "logs:UntagLogGroup",
         "logs:PutRetentionPolicy",
-        "logs:DeleteRetentionPolicy"
+        "logs:DeleteRetentionPolicy",
+        "logs:ListTagsLogGroup",
+        "logs:ListTagsForResource"
       ],
       "Resource": "*"
     },

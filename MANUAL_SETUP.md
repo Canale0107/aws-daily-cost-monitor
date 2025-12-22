@@ -3,81 +3,43 @@
 ## 🚨 問題
 
 `canale.dev` ユーザーには以下の権限がありません：
+
 - `iam:CreatePolicy`
 - `iam:PutUserPolicy`
 
 そのため、自動セットアップスクリプト（`setup-iam.sh`）が実行できません。
 
+## 📝 更新情報
+
+**最新版（v1.2）**: 以下の IAM アクションを追加しました：
+
+- `iam:ListRoles` - Terraform がロール一覧を取得するために必要
+- `iam:ListRoleTags` - ロールのタグを読み取るために必要
+- `iam:ListRolePolicies` - ロールのインラインポリシー一覧を取得するために必要
+- `iam:AttachRolePolicy` - 管理ポリシーをロールにアタッチするために必要
+- `iam:DetachRolePolicy` - 管理ポリシーをロールからデタッチするために必要
+- `iam:ListAttachedRolePolicies` - ロールにアタッチされた管理ポリシーを一覧取得するために必要（重要！）
+
+これらがないと `terraform plan` や `terraform apply` 実行時にエラーが発生します。
+
 ## ✅ 解決方法
 
-管理者権限を持つユーザー、またはAWSコンソールを使用して手動でセットアップする必要があります。
+管理者権限を持つユーザー、または AWS コンソールを使用して手動でセットアップする必要があります。
 
 ---
 
-## 📋 手順1: AWSコンソールでポリシーを作成
+## 📋 手順 1: AWS コンソールでポリシーを作成
 
-### 1-1. IAMコンソールを開く
+### 1-1. IAM コンソールを開く
 
 1. [AWS IAM コンソール](https://console.aws.amazon.com/iam/)にアクセス
 2. 左メニューから **「ポリシー」** を選択
 3. **「ポリシーの作成」** をクリック
 
-### 1-2. ポリシーJSONを入力
+### 1-2. ポリシー JSON を入力
 
 1. **「JSON」** タブを選択
-2. 以下の内容をコピー＆ペースト：
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": ["sns:*"],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": ["lambda:*"],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "iam:CreateRole",
-        "iam:DeleteRole",
-        "iam:GetRole",
-        "iam:TagRole",
-        "iam:UntagRole",
-        "iam:PutRolePolicy",
-        "iam:DeleteRolePolicy",
-        "iam:GetRolePolicy"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": "iam:PassRole",
-      "Resource": "*",
-      "Condition": {
-        "StringEquals": {
-          "iam:PassedToService": "lambda.amazonaws.com"
-        }
-      }
-    },
-    {
-      "Effect": "Allow",
-      "Action": ["logs:*"],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": ["events:*"],
-      "Resource": "*"
-    }
-  ]
-}
-```
+2. `[iam-policy-for-terraform]`の内容をコピー＆ペースト：
 
 3. **「次へ」** をクリック
 4. ポリシー名: **`TerraformDailyCostMonitorPolicy`**
@@ -86,21 +48,21 @@
 
 ---
 
-## 📋 手順2: ユーザーにポリシーをアタッチ
+## 📋 手順 2: ユーザーにポリシーをアタッチ
 
-### オプションA: 既存ユーザー（canale.dev）に追加
+### オプション A: 既存ユーザー（canale.dev）に追加
 
-1. IAMコンソールで **「ユーザー」** を選択
+1. IAM コンソールで **「ユーザー」** を選択
 2. **`canale.dev`** をクリック
 3. **「アクセス許可」** タブ
 4. **「アクセス許可を追加」** → **「ポリシーを直接アタッチする」**
 5. 検索欄に `TerraformDailyCostMonitorPolicy` と入力
-6. チェックボックスをON
+6. チェックボックスを ON
 7. **「次へ」** → **「アクセス許可を追加」**
 
-### オプションB: 新規ユーザーを作成（推奨）
+### オプション B: 新規ユーザーを作成（推奨）
 
-1. IAMコンソールで **「ユーザー」** を選択
+1. IAM コンソールで **「ユーザー」** を選択
 2. **「ユーザーを作成」** をクリック
 3. ユーザー名: **`terraform-daily-cost`**
 4. **「次へ」**
@@ -110,7 +72,7 @@
 
 ---
 
-## 📋 手順3: アクセスキーを作成
+## 📋 手順 3: アクセスキーを作成
 
 ### 3-1. アクセスキーの作成
 
@@ -118,7 +80,7 @@
 2. **「セキュリティ認証情報」** タブ
 3. **「アクセスキーを作成」** をクリック
 4. ユースケース: **「Command Line Interface (CLI)」** を選択
-5. 確認チェックボックスをON
+5. 確認チェックボックスを ON
 6. **「次へ」**
 7. 説明タグ（オプション）: `Terraform for daily-cost-monitor`
 8. **「アクセスキーを作成」**
@@ -129,7 +91,7 @@
 
 ---
 
-## 📋 手順4: AWS CLIの設定
+## 📋 手順 4: AWS CLI の設定
 
 ### ターミナルで実行
 
@@ -166,7 +128,7 @@ EOF
 
 ---
 
-## 📋 手順5: Terraformを実行
+## 📋 手順 5: Terraform を実行
 
 ```bash
 cd /Users/canale/Documents/daily-cost
@@ -268,11 +230,12 @@ Terraform実行用のIAMポリシーとユーザーの作成をお願いいた�
 
 ### Q: なぜ自動スクリプトが使えないのか？
 
-A: IAMポリシーやユーザーを作成するには、高い権限が必要です。セキュリティ上、これらの権限は管理者のみに付与されています。
+A: IAM ポリシーやユーザーを作成するには、高い権限が必要です。セキュリティ上、これらの権限は管理者のみに付与されています。
 
 ### Q: canale.dev ユーザーに直接権限を追加できないか？
 
 A: 可能ですが、以下の権限が必要です：
+
 - `iam:CreatePolicy`
 - `iam:AttachUserPolicy`
 - `iam:PutUserPolicy`
@@ -281,7 +244,7 @@ A: 可能ですが、以下の権限が必要です：
 
 ### Q: 別のアカウントでも使えるか？
 
-A: はい。アカウントID（010526250511）は自動的に認識されるため、同じポリシーを他のAWSアカウントでも使用できます。
+A: はい。アカウント ID（010526250511）は自動的に認識されるため、同じポリシーを他の AWS アカウントでも使用できます。
 
 ---
 
@@ -289,18 +252,23 @@ A: はい。アカウントID（010526250511）は自動的に認識されるた
 
 ### エラー: "Policy document is too large"
 
-→ `iam-policy-compact.json` を使用してください（578文字）
+→ `iam-policy-compact.json` を使用してください（713 文字）
 
 ### エラー: "AccessDenied"
 
-→ 管理者権限を持つユーザーで実行するか、AWSコンソールで手動作成してください
+→ 管理者権限を持つユーザーで実行するか、AWS コンソールで手動作成してください
 
 ### ポリシーが見つからない
 
-→ 正しいAWSアカウントにログインしているか確認してください
+→ 正しい AWS アカウントにログインしているか確認してください
 
 ---
 
-**作成日**: 2024年12月
-**更新日**: 2024年12月
+## 📅 変更履歴
 
+- **v1.2 (2024-12-22)**: IAM アクション追加（`iam:AttachRolePolicy`, `iam:DetachRolePolicy`, `iam:ListAttachedRolePolicies`）- 管理ポリシー操作のサポート
+- **v1.1 (2024-12-22)**: IAM アクション追加（`iam:ListRoles`, `iam:ListRoleTags`, `iam:ListRolePolicies`）- Terraform 実行時のエラーを修正
+- **v1.0 (2024-12-22)**: 初版リリース
+
+**作成日**: 2024 年 12 月 22 日
+**最終更新**: 2024 年 12 月 22 日
