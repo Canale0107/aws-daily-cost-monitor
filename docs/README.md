@@ -1,5 +1,7 @@
 # AWS Daily Cost and Resource Monitor
 
+[![CI/CD](https://github.com/Canale0107/aws-daily-cost-monitor/actions/workflows/ci.yml/badge.svg)](https://github.com/Canale0107/aws-daily-cost-monitor/actions/workflows/ci.yml)
+
 この Terraform プロジェクトは、AWS 上の毎日のコスト状況とリソース取得状況を自動的に取得し、メールで通知する仕組みを構築します。
 
 ## 機能
