@@ -143,6 +143,11 @@ jobs:
   python-tests:
     name: Python Tests & Coverage
     runs-on: ubuntu-latest
+    env:
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: dummy
+      AWS_SECRET_ACCESS_KEY: dummy
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
