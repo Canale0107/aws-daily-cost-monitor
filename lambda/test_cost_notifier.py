@@ -2,6 +2,7 @@
 Unit tests for cost_notifier Lambda function.
 Tests all functions with mocked AWS services.
 """
+
 import pytest
 import json
 from unittest.mock import patch, Mock
@@ -14,18 +15,19 @@ class TestGetCostData:
 
     def test_get_cost_data_success(self, mock_ce_client, mock_cost_response):
         """Test successful cost data retrieval"""
-        with patch('cost_notifier.ce_client', mock_ce_client):
+        with patch("cost_notifier.ce_client", mock_ce_client):
             from cost_notifier import get_cost_data
+
             result = get_cost_data(days=7)
 
             assert result is not None
-            assert 'ResultsByTime' in result
-            assert len(result['ResultsByTime']) == 2
+            assert "ResultsByTime" in result
+            assert len(result["ResultsByTime"]) == 2
             mock_ce_client.get_cost_and_usage.assert_called_once()
 
     def test_get_cost_data_with_different_days(self, mock_ce_client):
         """Test cost data retrieval with different day parameters"""
-        with patch('cost_notifier.ce_client', mock_ce_client):
+        with patch("cost_notifier.ce_client", mock_ce_client):
             from cost_notifier import get_cost_data
 
             # Test with 1 day
@@ -38,8 +40,9 @@ class TestGetCostData:
 
     def test_get_cost_data_exception(self, mock_ce_client_exception):
         """Test cost data retrieval when API raises exception"""
-        with patch('cost_notifier.ce_client', mock_ce_client_exception):
+        with patch("cost_notifier.ce_client", mock_ce_client_exception):
             from cost_notifier import get_cost_data
+
             result = get_cost_data(days=7)
 
             assert result is None
@@ -50,12 +53,13 @@ class TestGetCostData:
         mock_client = Mock()
         mock_client.get_cost_and_usage.return_value = mock_empty_cost_response
 
-        with patch('cost_notifier.ce_client', mock_client):
+        with patch("cost_notifier.ce_client", mock_client):
             from cost_notifier import get_cost_data
+
             result = get_cost_data(days=7)
 
             assert result is not None
-            assert result['ResultsByTime'] == []
+            assert result["ResultsByTime"] == []
 
 
 @pytest.mark.unit
@@ -66,124 +70,141 @@ class TestGetResourceCounts:
         self, mock_ec2_client, mock_rds_client, mock_s3_client, mock_lambda_client
     ):
         """Test resource counts when all services return successfully"""
-        with patch('cost_notifier.ec2_client', mock_ec2_client), \
-             patch('cost_notifier.rds_client', mock_rds_client), \
-             patch('cost_notifier.s3_client', mock_s3_client), \
-             patch('cost_notifier.lambda_client', mock_lambda_client):
+        with patch("cost_notifier.ec2_client", mock_ec2_client), patch(
+            "cost_notifier.rds_client", mock_rds_client
+        ), patch("cost_notifier.s3_client", mock_s3_client), patch(
+            "cost_notifier.lambda_client", mock_lambda_client
+        ):
 
             from cost_notifier import get_resource_counts
+
             resources = get_resource_counts()
 
-            assert resources['EC2']['total'] == 3
-            assert resources['EC2']['running'] == 2
-            assert resources['RDS']['total'] == 1
-            assert resources['RDS']['available'] == 1
-            assert resources['S3']['total_buckets'] == 5
-            assert resources['Lambda']['total_functions'] == 2
+            assert resources["EC2"]["total"] == 3
+            assert resources["EC2"]["running"] == 2
+            assert resources["RDS"]["total"] == 1
+            assert resources["RDS"]["available"] == 1
+            assert resources["S3"]["total_buckets"] == 5
+            assert resources["Lambda"]["total_functions"] == 2
 
     def test_get_resource_counts_ec2_exception(
-        self, mock_ec2_client_exception, mock_rds_client, mock_s3_client, mock_lambda_client
+        self,
+        mock_ec2_client_exception,
+        mock_rds_client,
+        mock_s3_client,
+        mock_lambda_client,
     ):
         """Test resource counts when EC2 raises exception"""
-        with patch('cost_notifier.ec2_client', mock_ec2_client_exception), \
-             patch('cost_notifier.rds_client', mock_rds_client), \
-             patch('cost_notifier.s3_client', mock_s3_client), \
-             patch('cost_notifier.lambda_client', mock_lambda_client):
+        with patch("cost_notifier.ec2_client", mock_ec2_client_exception), patch(
+            "cost_notifier.rds_client", mock_rds_client
+        ), patch("cost_notifier.s3_client", mock_s3_client), patch(
+            "cost_notifier.lambda_client", mock_lambda_client
+        ):
 
             from cost_notifier import get_resource_counts
+
             resources = get_resource_counts()
 
             # EC2 should have zero counts due to exception
-            assert resources['EC2']['total'] == 0
-            assert resources['EC2']['running'] == 0
+            assert resources["EC2"]["total"] == 0
+            assert resources["EC2"]["running"] == 0
 
             # Other services should still work
-            assert resources['RDS']['total'] == 1
-            assert resources['S3']['total_buckets'] == 5
-            assert resources['Lambda']['total_functions'] == 2
+            assert resources["RDS"]["total"] == 1
+            assert resources["S3"]["total_buckets"] == 5
+            assert resources["Lambda"]["total_functions"] == 2
 
     def test_get_resource_counts_all_exceptions(
-        self, mock_ec2_client_exception, mock_rds_client_exception,
-        mock_s3_client_exception, mock_lambda_client_exception
+        self,
+        mock_ec2_client_exception,
+        mock_rds_client_exception,
+        mock_s3_client_exception,
+        mock_lambda_client_exception,
     ):
         """Test resource counts when all services raise exceptions"""
-        with patch('cost_notifier.ec2_client', mock_ec2_client_exception), \
-             patch('cost_notifier.rds_client', mock_rds_client_exception), \
-             patch('cost_notifier.s3_client', mock_s3_client_exception), \
-             patch('cost_notifier.lambda_client', mock_lambda_client_exception):
+        with patch("cost_notifier.ec2_client", mock_ec2_client_exception), patch(
+            "cost_notifier.rds_client", mock_rds_client_exception
+        ), patch("cost_notifier.s3_client", mock_s3_client_exception), patch(
+            "cost_notifier.lambda_client", mock_lambda_client_exception
+        ):
 
             from cost_notifier import get_resource_counts
+
             resources = get_resource_counts()
 
             # All should have zero/empty counts
-            assert resources['EC2']['total'] == 0
-            assert resources['EC2']['running'] == 0
-            assert resources['RDS']['total'] == 0
-            assert resources['RDS']['available'] == 0
-            assert resources['S3']['total_buckets'] == 0
-            assert resources['Lambda']['total_functions'] == 0
+            assert resources["EC2"]["total"] == 0
+            assert resources["EC2"]["running"] == 0
+            assert resources["RDS"]["total"] == 0
+            assert resources["RDS"]["available"] == 0
+            assert resources["S3"]["total_buckets"] == 0
+            assert resources["Lambda"]["total_functions"] == 0
 
     def test_get_resource_counts_empty_resources(self):
         """Test resource counts with no resources"""
         mock_ec2 = Mock()
-        mock_ec2.describe_instances.return_value = {'Reservations': []}
+        mock_ec2.describe_instances.return_value = {"Reservations": []}
 
         mock_rds = Mock()
-        mock_rds.describe_db_instances.return_value = {'DBInstances': []}
+        mock_rds.describe_db_instances.return_value = {"DBInstances": []}
 
         mock_s3 = Mock()
-        mock_s3.list_buckets.return_value = {'Buckets': []}
+        mock_s3.list_buckets.return_value = {"Buckets": []}
 
         mock_lambda = Mock()
-        mock_lambda.list_functions.return_value = {'Functions': []}
+        mock_lambda.list_functions.return_value = {"Functions": []}
 
-        with patch('cost_notifier.ec2_client', mock_ec2), \
-             patch('cost_notifier.rds_client', mock_rds), \
-             patch('cost_notifier.s3_client', mock_s3), \
-             patch('cost_notifier.lambda_client', mock_lambda):
+        with patch("cost_notifier.ec2_client", mock_ec2), patch(
+            "cost_notifier.rds_client", mock_rds
+        ), patch("cost_notifier.s3_client", mock_s3), patch(
+            "cost_notifier.lambda_client", mock_lambda
+        ):
 
             from cost_notifier import get_resource_counts
+
             resources = get_resource_counts()
 
-            assert resources['EC2']['total'] == 0
-            assert resources['EC2']['running'] == 0
-            assert resources['RDS']['total'] == 0
-            assert resources['S3']['total_buckets'] == 0
-            assert resources['Lambda']['total_functions'] == 0
+            assert resources["EC2"]["total"] == 0
+            assert resources["EC2"]["running"] == 0
+            assert resources["RDS"]["total"] == 0
+            assert resources["S3"]["total_buckets"] == 0
+            assert resources["Lambda"]["total_functions"] == 0
 
 
 @pytest.mark.unit
 class TestFormatCostMessage:
     """Tests for format_cost_message function"""
 
-    def test_format_cost_message_with_valid_data(self, mock_cost_response, mock_resource_data):
+    def test_format_cost_message_with_valid_data(
+        self, mock_cost_response, mock_resource_data
+    ):
         """Test message formatting with valid cost and resource data"""
         from cost_notifier import format_cost_message
 
         message = format_cost_message(mock_cost_response, mock_resource_data, 7)
 
         # Check for Japanese text
-        assert 'AWS 日次レポート' in message
-        assert 'コスト情報' in message
-        assert 'リソース情報' in message
+        assert "AWS 日次レポート" in message
+        assert "コスト情報" in message
+        assert "リソース情報" in message
 
         # Check for cost information
-        assert '2024-01-01' in message
-        assert '2024-01-02' in message
-        assert '$' in message
+        assert "2024-01-01" in message
+        assert "2024-01-02" in message
+        assert "$" in message
 
         # Check for resource information
-        assert 'EC2 インスタンス' in message
-        assert 'RDS インスタンス' in message
-        assert 'S3 バケット' in message
-        assert 'Lambda 関数' in message
+        assert "EC2 インスタンス" in message
+        assert "RDS インスタンス" in message
+        assert "S3 バケット" in message
+        assert "Lambda 関数" in message
 
         # Check for resource counts
-        assert '総数: 3' in message  # EC2 total
-        assert '稼働中: 2' in message  # EC2 running
-        assert '総数: 1' in message  # RDS total
-        assert '総数: 5' in message  # S3 buckets
-        assert '総数: 2' in message  # Lambda functions
+        assert "総数: 3" in message  # EC2 total
+        assert "稼働中: 2" in message  # EC2 running
+        assert "総数: 1" in message  # RDS total
+        assert "総数: 5" in message  # S3 buckets
+        assert "総数: 2" in message  # Lambda functions
 
     def test_format_cost_message_with_none_cost_data(self, mock_resource_data):
         """Test message formatting when cost data is None"""
@@ -191,43 +212,49 @@ class TestFormatCostMessage:
 
         message = format_cost_message(None, mock_resource_data, 7)
 
-        assert 'コストデータの取得に失敗しました' in message
+        assert "コストデータの取得に失敗しました" in message
 
-    def test_format_cost_message_unicode_preservation(self, mock_cost_response, mock_resource_data):
+    def test_format_cost_message_unicode_preservation(
+        self, mock_cost_response, mock_resource_data
+    ):
         """Test that Japanese characters are properly preserved"""
         from cost_notifier import format_cost_message
 
         message = format_cost_message(mock_cost_response, mock_resource_data, 7)
 
         # Verify specific Japanese characters and emojis
-        assert '📅' in message
-        assert '💰' in message
-        assert '🔧' in message
-        assert '📦' in message
-        assert '🗄️' in message
-        assert '🪣' in message
-        assert 'λ' in message
+        assert "📅" in message
+        assert "💰" in message
+        assert "🔧" in message
+        assert "📦" in message
+        assert "🗄️" in message
+        assert "🪣" in message
+        assert "λ" in message
 
-    def test_format_cost_message_decimal_precision(self, mock_cost_response, mock_resource_data):
+    def test_format_cost_message_decimal_precision(
+        self, mock_cost_response, mock_resource_data
+    ):
         """Test that decimal currency values are formatted correctly"""
         from cost_notifier import format_cost_message
 
         message = format_cost_message(mock_cost_response, mock_resource_data, 7)
 
         # Check for properly formatted currency (2 decimal places)
-        assert '.50' in message or '.25' in message or '.00' in message
+        assert ".50" in message or ".25" in message or ".00" in message
 
-    def test_format_cost_message_different_days(self, mock_cost_response, mock_resource_data):
+    def test_format_cost_message_different_days(
+        self, mock_cost_response, mock_resource_data
+    ):
         """Test message formatting with different day parameters"""
         from cost_notifier import format_cost_message
 
         # Test with 1 day
         message_1 = format_cost_message(mock_cost_response, mock_resource_data, 1)
-        assert '過去1日間' in message_1
+        assert "過去1日間" in message_1
 
         # Test with 30 days
         message_30 = format_cost_message(mock_cost_response, mock_resource_data, 30)
-        assert '過去30日間' in message_30
+        assert "過去30日間" in message_30
 
 
 @pytest.mark.unit
@@ -236,7 +263,7 @@ class TestSendNotification:
 
     def test_send_notification_success(self, mock_sns_client):
         """Test successful SNS notification"""
-        with patch('cost_notifier.sns_client', mock_sns_client):
+        with patch("cost_notifier.sns_client", mock_sns_client):
             from cost_notifier import send_notification
 
             message = "Test message"
@@ -247,13 +274,13 @@ class TestSendNotification:
             assert result is True
             mock_sns_client.publish.assert_called_once()
             call_args = mock_sns_client.publish.call_args
-            assert call_args[1]['TopicArn'] == topic_arn
-            assert call_args[1]['Message'] == message
-            assert 'Subject' in call_args[1]
+            assert call_args[1]["TopicArn"] == topic_arn
+            assert call_args[1]["Message"] == message
+            assert "Subject" in call_args[1]
 
     def test_send_notification_exception(self, mock_sns_client_exception):
         """Test SNS notification when exception occurs"""
-        with patch('cost_notifier.sns_client', mock_sns_client_exception):
+        with patch("cost_notifier.sns_client", mock_sns_client_exception):
             from cost_notifier import send_notification
 
             message = "Test message"
@@ -270,74 +297,103 @@ class TestLambdaHandler:
     """Integration tests for lambda_handler function"""
 
     def test_lambda_handler_success(
-        self, mock_environment, mock_ce_client, mock_sns_client,
-        mock_ec2_client, mock_rds_client, mock_s3_client, mock_lambda_client
+        self,
+        mock_environment,
+        mock_ce_client,
+        mock_sns_client,
+        mock_ec2_client,
+        mock_rds_client,
+        mock_s3_client,
+        mock_lambda_client,
     ):
         """Test successful lambda handler execution"""
-        with patch('cost_notifier.ce_client', mock_ce_client), \
-             patch('cost_notifier.sns_client', mock_sns_client), \
-             patch('cost_notifier.ec2_client', mock_ec2_client), \
-             patch('cost_notifier.rds_client', mock_rds_client), \
-             patch('cost_notifier.s3_client', mock_s3_client), \
-             patch('cost_notifier.lambda_client', mock_lambda_client):
+        with patch("cost_notifier.ce_client", mock_ce_client), patch(
+            "cost_notifier.sns_client", mock_sns_client
+        ), patch("cost_notifier.ec2_client", mock_ec2_client), patch(
+            "cost_notifier.rds_client", mock_rds_client
+        ), patch(
+            "cost_notifier.s3_client", mock_s3_client
+        ), patch(
+            "cost_notifier.lambda_client", mock_lambda_client
+        ):
 
             from cost_notifier import lambda_handler
 
             response = lambda_handler({}, None)
 
-            assert response['statusCode'] == 200
-            assert 'Report sent successfully' in response['body']
+            assert response["statusCode"] == 200
+            assert "Report sent successfully" in response["body"]
             mock_ce_client.get_cost_and_usage.assert_called_once()
             mock_sns_client.publish.assert_called_once()
 
     def test_lambda_handler_missing_sns_topic_arn(self, monkeypatch):
         """Test lambda handler when SNS_TOPIC_ARN is not set"""
         # Remove SNS_TOPIC_ARN from environment
-        monkeypatch.delenv('SNS_TOPIC_ARN', raising=False)
+        monkeypatch.delenv("SNS_TOPIC_ARN", raising=False)
 
         from cost_notifier import lambda_handler
 
         response = lambda_handler({}, None)
 
-        assert response['statusCode'] == 500
-        assert 'SNS_TOPIC_ARN not configured' in response['body']
+        assert response["statusCode"] == 500
+        assert "SNS_TOPIC_ARN not configured" in response["body"]
 
     def test_lambda_handler_with_custom_days(
-        self, monkeypatch, mock_ce_client, mock_sns_client,
-        mock_ec2_client, mock_rds_client, mock_s3_client, mock_lambda_client
+        self,
+        monkeypatch,
+        mock_ce_client,
+        mock_sns_client,
+        mock_ec2_client,
+        mock_rds_client,
+        mock_s3_client,
+        mock_lambda_client,
     ):
         """Test lambda handler with custom DAYS_TO_CHECK"""
-        monkeypatch.setenv('SNS_TOPIC_ARN', 'arn:aws:sns:us-east-1:123456789012:test-topic')
-        monkeypatch.setenv('DAYS_TO_CHECK', '30')
+        monkeypatch.setenv(
+            "SNS_TOPIC_ARN", "arn:aws:sns:us-east-1:123456789012:test-topic"
+        )
+        monkeypatch.setenv("DAYS_TO_CHECK", "30")
 
-        with patch('cost_notifier.ce_client', mock_ce_client), \
-             patch('cost_notifier.sns_client', mock_sns_client), \
-             patch('cost_notifier.ec2_client', mock_ec2_client), \
-             patch('cost_notifier.rds_client', mock_rds_client), \
-             patch('cost_notifier.s3_client', mock_s3_client), \
-             patch('cost_notifier.lambda_client', mock_lambda_client):
+        with patch("cost_notifier.ce_client", mock_ce_client), patch(
+            "cost_notifier.sns_client", mock_sns_client
+        ), patch("cost_notifier.ec2_client", mock_ec2_client), patch(
+            "cost_notifier.rds_client", mock_rds_client
+        ), patch(
+            "cost_notifier.s3_client", mock_s3_client
+        ), patch(
+            "cost_notifier.lambda_client", mock_lambda_client
+        ):
 
             from cost_notifier import lambda_handler
 
             response = lambda_handler({}, None)
 
-            assert response['statusCode'] == 200
+            assert response["statusCode"] == 200
 
     def test_lambda_handler_sns_failure(
-        self, mock_environment, mock_ce_client, mock_sns_client_exception,
-        mock_ec2_client, mock_rds_client, mock_s3_client, mock_lambda_client
+        self,
+        mock_environment,
+        mock_ce_client,
+        mock_sns_client_exception,
+        mock_ec2_client,
+        mock_rds_client,
+        mock_s3_client,
+        mock_lambda_client,
     ):
         """Test lambda handler when SNS notification fails"""
-        with patch('cost_notifier.ce_client', mock_ce_client), \
-             patch('cost_notifier.sns_client', mock_sns_client_exception), \
-             patch('cost_notifier.ec2_client', mock_ec2_client), \
-             patch('cost_notifier.rds_client', mock_rds_client), \
-             patch('cost_notifier.s3_client', mock_s3_client), \
-             patch('cost_notifier.lambda_client', mock_lambda_client):
+        with patch("cost_notifier.ce_client", mock_ce_client), patch(
+            "cost_notifier.sns_client", mock_sns_client_exception
+        ), patch("cost_notifier.ec2_client", mock_ec2_client), patch(
+            "cost_notifier.rds_client", mock_rds_client
+        ), patch(
+            "cost_notifier.s3_client", mock_s3_client
+        ), patch(
+            "cost_notifier.lambda_client", mock_lambda_client
+        ):
 
             from cost_notifier import lambda_handler
 
             response = lambda_handler({}, None)
 
-            assert response['statusCode'] == 500
-            assert 'Failed to send report' in response['body']
+            assert response["statusCode"] == 500
+            assert "Failed to send report" in response["body"]

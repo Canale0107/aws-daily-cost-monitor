@@ -12,7 +12,7 @@ variable "notification_email" {
 variable "schedule_expression" {
   description = "EventBridge schedule expression (default: 9 AM JST daily)"
   type        = string
-  default     = "cron(0 0 * * ? *)"  # UTC 00:00 = JST 09:00
+  default     = "cron(0 0 * * ? *)" # UTC 00:00 = JST 09:00
 }
 
 variable "project_name" {

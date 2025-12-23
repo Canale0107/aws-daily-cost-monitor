@@ -82,12 +82,12 @@ resource "aws_iam_role_policy" "lambda_policy" {
 resource "aws_lambda_function" "cost_notifier" {
   filename         = data.archive_file.lambda_zip.output_path
   function_name    = "${var.project_name}-function"
-  role            = aws_iam_role.lambda_role.arn
-  handler         = "cost_notifier.lambda_handler"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "cost_notifier.lambda_handler"
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-  runtime         = "python3.11"
-  timeout         = 300
-  memory_size     = 256
+  runtime          = "python3.11"
+  timeout          = 300
+  memory_size      = 256
 
   environment {
     variables = {

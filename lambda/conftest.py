@@ -1,6 +1,7 @@
 """
 Pytest configuration and fixtures for testing cost_notifier Lambda function.
 """
+
 import pytest
 from unittest.mock import Mock, MagicMock
 from decimal import Decimal
@@ -11,59 +12,37 @@ from datetime import datetime
 def mock_cost_response():
     """Mock response from AWS Cost Explorer API"""
     return {
-        'ResultsByTime': [
+        "ResultsByTime": [
             {
-                'TimePeriod': {
-                    'Start': '2024-01-01',
-                    'End': '2024-01-02'
-                },
-                'Groups': [
+                "TimePeriod": {"Start": "2024-01-01", "End": "2024-01-02"},
+                "Groups": [
                     {
-                        'Keys': ['AmazonEC2'],
-                        'Metrics': {
-                            'UnblendedCost': {
-                                'Amount': '10.50',
-                                'Unit': 'USD'
-                            }
-                        }
+                        "Keys": ["AmazonEC2"],
+                        "Metrics": {
+                            "UnblendedCost": {"Amount": "10.50", "Unit": "USD"}
+                        },
                     },
                     {
-                        'Keys': ['AmazonRDS'],
-                        'Metrics': {
-                            'UnblendedCost': {
-                                'Amount': '5.25',
-                                'Unit': 'USD'
-                            }
-                        }
+                        "Keys": ["AmazonRDS"],
+                        "Metrics": {"UnblendedCost": {"Amount": "5.25", "Unit": "USD"}},
                     },
                     {
-                        'Keys': ['AmazonS3'],
-                        'Metrics': {
-                            'UnblendedCost': {
-                                'Amount': '0.50',
-                                'Unit': 'USD'
-                            }
-                        }
-                    }
-                ]
+                        "Keys": ["AmazonS3"],
+                        "Metrics": {"UnblendedCost": {"Amount": "0.50", "Unit": "USD"}},
+                    },
+                ],
             },
             {
-                'TimePeriod': {
-                    'Start': '2024-01-02',
-                    'End': '2024-01-03'
-                },
-                'Groups': [
+                "TimePeriod": {"Start": "2024-01-02", "End": "2024-01-03"},
+                "Groups": [
                     {
-                        'Keys': ['AmazonEC2'],
-                        'Metrics': {
-                            'UnblendedCost': {
-                                'Amount': '11.00',
-                                'Unit': 'USD'
-                            }
-                        }
+                        "Keys": ["AmazonEC2"],
+                        "Metrics": {
+                            "UnblendedCost": {"Amount": "11.00", "Unit": "USD"}
+                        },
                     }
-                ]
-            }
+                ],
+            },
         ]
     }
 
@@ -71,29 +50,17 @@ def mock_cost_response():
 @pytest.fixture
 def mock_empty_cost_response():
     """Mock empty response from Cost Explorer"""
-    return {
-        'ResultsByTime': []
-    }
+    return {"ResultsByTime": []}
 
 
 @pytest.fixture
 def mock_resource_data():
     """Mock resource counts for all services"""
     return {
-        'EC2': {
-            'total': 3,
-            'running': 2
-        },
-        'RDS': {
-            'total': 1,
-            'available': 1
-        },
-        'S3': {
-            'total_buckets': 5
-        },
-        'Lambda': {
-            'total_functions': 2
-        }
+        "EC2": {"total": 3, "running": 2},
+        "RDS": {"total": 1, "available": 1},
+        "S3": {"total_buckets": 5},
+        "Lambda": {"total_functions": 2},
     }
 
 
@@ -117,9 +84,7 @@ def mock_ce_client_exception():
 def mock_sns_client():
     """Mock SNS client"""
     client = Mock()
-    client.publish.return_value = {
-        'MessageId': 'test-message-id-12345'
-    }
+    client.publish.return_value = {"MessageId": "test-message-id-12345"}
     return client
 
 
@@ -136,18 +101,14 @@ def mock_ec2_client():
     """Mock EC2 client"""
     client = Mock()
     client.describe_instances.return_value = {
-        'Reservations': [
+        "Reservations": [
             {
-                'Instances': [
-                    {'State': {'Name': 'running'}},
-                    {'State': {'Name': 'running'}}
+                "Instances": [
+                    {"State": {"Name": "running"}},
+                    {"State": {"Name": "running"}},
                 ]
             },
-            {
-                'Instances': [
-                    {'State': {'Name': 'stopped'}}
-                ]
-            }
+            {"Instances": [{"State": {"Name": "stopped"}}]},
         ]
     }
     return client
@@ -166,9 +127,7 @@ def mock_rds_client():
     """Mock RDS client"""
     client = Mock()
     client.describe_db_instances.return_value = {
-        'DBInstances': [
-            {'DBInstanceStatus': 'available'}
-        ]
+        "DBInstances": [{"DBInstanceStatus": "available"}]
     }
     return client
 
@@ -186,12 +145,12 @@ def mock_s3_client():
     """Mock S3 client"""
     client = Mock()
     client.list_buckets.return_value = {
-        'Buckets': [
-            {'Name': 'bucket1'},
-            {'Name': 'bucket2'},
-            {'Name': 'bucket3'},
-            {'Name': 'bucket4'},
-            {'Name': 'bucket5'}
+        "Buckets": [
+            {"Name": "bucket1"},
+            {"Name": "bucket2"},
+            {"Name": "bucket3"},
+            {"Name": "bucket4"},
+            {"Name": "bucket5"},
         ]
     }
     return client
@@ -210,10 +169,7 @@ def mock_lambda_client():
     """Mock Lambda client"""
     client = Mock()
     client.list_functions.return_value = {
-        'Functions': [
-            {'FunctionName': 'function1'},
-            {'FunctionName': 'function2'}
-        ]
+        "Functions": [{"FunctionName": "function1"}, {"FunctionName": "function2"}]
     }
     return client
 
@@ -229,5 +185,5 @@ def mock_lambda_client_exception():
 @pytest.fixture
 def mock_environment(monkeypatch):
     """Mock environment variables"""
-    monkeypatch.setenv('SNS_TOPIC_ARN', 'arn:aws:sns:us-east-1:123456789012:test-topic')
-    monkeypatch.setenv('DAYS_TO_CHECK', '7')
+    monkeypatch.setenv("SNS_TOPIC_ARN", "arn:aws:sns:us-east-1:123456789012:test-topic")
+    monkeypatch.setenv("DAYS_TO_CHECK", "7")
