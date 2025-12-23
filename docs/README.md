@@ -100,19 +100,25 @@ export AWS_PROFILE=daily-cost-terraform
 export AWS_PROFILE=your-profile
 ```
 
-### 4. Terraform の初期化
+### 4. Terraform ディレクトリに移動
+
+```bash
+cd terraform
+```
+
+### 5. Terraform の初期化
 
 ```bash
 terraform init
 ```
 
-### 5. プランの確認
+### 6. プランの確認
 
 ```bash
 terraform plan
 ```
 
-### 6. リソースの作成
+### 7. リソースの作成
 
 ```bash
 terraform apply
@@ -121,7 +127,7 @@ terraform apply
 実行後、指定したメールアドレスに **SNS サブスクリプションの確認メール** が届きます。
 メール内の確認リンクをクリックして、サブスクリプションを有効化してください。
 
-### 7. 動作確認（オプション）
+### 8. 動作確認（オプション）
 
 Lambda 関数を手動で実行してテストできます：
 
@@ -229,6 +235,7 @@ Cost Explorer API へのアクセスには `ce:GetCostAndUsage` 権限が必要�
 ### Terraform リソースの削除
 
 ```bash
+cd terraform
 terraform destroy
 ```
 
@@ -300,6 +307,8 @@ bandit -r lambda/
 #### 4. Terraform チェック
 
 ```bash
+cd terraform
+
 # フォーマットチェック
 terraform fmt -check
 

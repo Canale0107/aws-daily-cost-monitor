@@ -45,6 +45,9 @@ notification_email = "your-email@example.com"  # ← ここを変更
 # プロファイルを設定
 export AWS_PROFILE=daily-cost-terraform
 
+# Terraform ディレクトリに移動
+cd terraform
+
 # 初期化
 terraform init
 
@@ -136,6 +139,7 @@ aws events enable-rule --name daily-cost-monitor-daily-trigger
 
 ```bash
 # Terraformリソースを削除
+cd terraform
 terraform destroy
 
 # IAMリソースも削除する場合
@@ -176,6 +180,8 @@ echo $AWS_PROFILE
 ### Terraform エラー
 
 ```bash
+cd terraform
+
 # 状態をクリーンアップ
 terraform init -reconfigure
 

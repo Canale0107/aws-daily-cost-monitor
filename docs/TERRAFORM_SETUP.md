@@ -53,6 +53,7 @@ aws configure --profile daily-cost-terraform
 
 ```bash
 export AWS_PROFILE=daily-cost-terraform
+cd terraform
 terraform init
 terraform plan
 terraform apply
@@ -104,6 +105,9 @@ export AWS_ACCESS_KEY_ID="..."
 export AWS_SECRET_ACCESS_KEY="..."
 export AWS_SESSION_TOKEN="..."
 
+# Terraform ディレクトリに移動
+cd terraform
+
 # Terraformを実行
 terraform init
 terraform plan
@@ -117,6 +121,7 @@ terraform apply
 ```bash
 aws configure --profile admin
 export AWS_PROFILE=admin
+cd terraform
 terraform init
 terraform plan
 terraform apply

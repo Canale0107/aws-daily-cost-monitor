@@ -143,6 +143,9 @@ vim terraform.tfvars
 # プロファイルを設定
 export AWS_PROFILE=daily-cost-terraform
 
+# Terraform ディレクトリに移動
+cd terraform
+
 # Terraform実行
 terraform init
 terraform plan
