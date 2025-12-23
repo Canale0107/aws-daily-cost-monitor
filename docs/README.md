@@ -240,7 +240,7 @@ setup-iam.sh で作成した IAM ユーザーとポリシーを削除する場�
 
 ## CI/CD
 
-[![CI/CD](https://github.com/YOUR_USERNAME/daily-cost/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/daily-cost/actions/workflows/ci.yml)
+[![CI/CD](https://github.com/Canale0107/aws-daily-cost-monitor/actions/workflows/ci.yml/badge.svg)](https://github.com/Canale0107/aws-daily-cost-monitor/actions/workflows/ci.yml)
 
 このプロジェクトには GitHub Actions による自動テストが組み込まれています。
 
