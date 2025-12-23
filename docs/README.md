@@ -238,6 +238,79 @@ setup-iam.sh で作成した IAM ユーザーとポリシーを削除する場�
 ./cleanup-iam.sh
 ```
 
+## CI/CD
+
+[![CI/CD](https://github.com/YOUR_USERNAME/daily-cost/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/daily-cost/actions/workflows/ci.yml)
+
+このプロジェクトには GitHub Actions による自動テストが組み込まれています。
+
+### 実行されるテスト
+
+**Terraform**
+- フォーマットチェック (`terraform fmt`)
+- 構文検証 (`terraform validate`)
+- セキュリティスキャン (`tfsec`)
+
+**Python**
+- コードフォーマットチェック (`black`)
+- コード品質チェック (`pylint`)
+- セキュリティスキャン (`bandit`)
+- ユニットテスト + カバレッジ (`pytest`)
+
+### ローカルでのテスト実行
+
+#### 1. 開発用依存関係のインストール
+
+```bash
+cd lambda
+pip install -r requirements-dev.txt
+```
+
+#### 2. テストの実行
+
+```bash
+# すべてのテストを実行
+pytest
+
+# カバレッジ付きで実行
+pytest --cov=. --cov-report=html
+
+# カバレッジレポートを確認
+open htmlcov/index.html
+```
+
+#### 3. コード品質チェック
+
+```bash
+# フォーマットチェック
+black --check lambda/
+
+# フォーマット自動修正
+black lambda/
+
+# Pylint
+pylint lambda/cost_notifier.py
+
+# Bandit セキュリティスキャン
+bandit -r lambda/
+```
+
+#### 4. Terraform チェック
+
+```bash
+# フォーマットチェック
+terraform fmt -check
+
+# フォーマット自動修正
+terraform fmt
+
+# 検証
+terraform validate
+
+# セキュリティスキャン
+tfsec .
+```
+
 ## ライセンス
 
 MIT License

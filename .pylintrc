@@ -1,0 +1,39 @@
+[MASTER]
+# Use multiple processes to speed up Pylint
+jobs=1
+
+[MESSAGES CONTROL]
+# Disable specific warnings that are not relevant for this project
+disable=
+    too-few-public-methods,
+    import-outside-toplevel,
+    missing-docstring,
+    line-too-long,
+    too-many-locals,
+    too-many-branches,
+    broad-except
+
+[FORMAT]
+# Maximum number of characters on a single line
+max-line-length=120
+
+[BASIC]
+# Good variable names which should always be accepted
+good-names=i,j,k,ex,_,ce,ec2,rds,s3,sns
+
+# Minimum line length for functions/classes names
+min-similarity-lines=4
+
+[DESIGN]
+# Maximum number of arguments for function / method
+max-args=7
+
+[REPORTS]
+# Set the output format
+output-format=text
+
+# Tells whether to display a full report or only the messages
+reports=no
+
+# Evaluation score threshold
+fail-under=8.0

@@ -37,3 +37,11 @@ Thumbs.db
 
 # Output files
 output.json
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+test-results.xml
+bandit-report.json

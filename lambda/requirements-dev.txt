@@ -1,0 +1,14 @@
+# Development and Testing Dependencies
+
+# Testing Framework
+pytest>=7.4.0
+pytest-cov>=4.1.0
+moto[ce,ec2,rds,s3,lambda,sns]>=4.2.0
+
+# Code Quality
+pylint>=2.17.0
+black>=23.7.0
+bandit>=1.7.5
+
+# Production dependency (included for consistency)
+boto3>=1.26.0
