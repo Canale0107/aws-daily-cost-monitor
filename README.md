@@ -22,7 +22,7 @@ Lambda関数
     └─→ SNS (メール通知)
 ```
 
-![構成図](/diagrams/overview.svg)
+![構成図](/diagrams/overview.drawio.svg)
 
 ## 構成要素
 
